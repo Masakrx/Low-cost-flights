@@ -1,8 +1,7 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-
-<div id="mainDiv" style="position:center">    
+<div id="mainDiv" style="position:center" hidden>    
     <div style="margin-bottom: 20px;">
         <label style="margin-right:5px;">Polazni aerodrom:</label>
         <select class="Airport" style="display:inline-block; width:70px;" id="departurePicker"></select>
@@ -41,13 +40,14 @@
     (function ($) {
         $(function () {
             $("#passagerNumberPicker").multiselect({
-                buttonWidth: '55px'
+                buttonWidth: '70px'
             });
             $("#currencyPicker").multiselect({
-                buttonWidth: '65px'
+                buttonWidth: '70px'
             }); 
-            UpdateAirports();
-            UpdateDateRangePicker();
+
+            UpdateElements();
+           
             
         });
         $(function () {
@@ -55,6 +55,18 @@
             //$('#loadingGIF').hide();
         });
         })(jQuery);
+</script>
+
+<script>
+    function UpdateElements() {
+        UpdateAirports().done(function () {
+            alert("UpdateAirports gotov");
+            UpdateDateRangePicker().done(function () {
+                alert("UpdateDateRangePicker gotov");
+            });
+        });
+        
+    }
 </script>
 
 
@@ -86,27 +98,34 @@
 
 <script>
     function UpdateDateRangePicker() {
-        var pickers = document.getElementsByClassName("singleDatePickers");
-        jQuery.each(pickers, function (ID, picker) {
-            $(picker).daterangepicker({
-                singleDatePicker: true,
-                locale: {
-                    //format: 'DD.MM.YYYY.',
-                    format: 'YYYY-MM-DD',
-                    daysOfWeek: ["Ned", "Pon", "Uto",
-                        "Sri", "Čet", "Pet", "Sub"],
-                    monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
-                },
-                changeYear: true,
-                changeMonth: true
+        var deferred = $.Deferred();
+        setTimeout(function () {
+            var pickers = document.getElementsByClassName("singleDatePickers");
+            jQuery.each(pickers, function (ID, picker) {
+                $(picker).daterangepicker({
+                    singleDatePicker: true,
+                    locale: {
+                        //format: 'DD.MM.YYYY.',
+                        format: 'YYYY-MM-DD',
+                        daysOfWeek: ["Ned", "Pon", "Uto",
+                            "Sri", "Čet", "Pet", "Sub"],
+                        monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
+                    },
+                    changeYear: true,
+                    changeMonth: true
+                });
             });
-        });
+            deferred.resolve();
+        }, 1000);
+
+        return $.when(deferred).done(function(){}).promise();
+        
+
     }
 </script>
 
 <script>
-    $('#search').click(function (e) {
-        e.preventDefault();
+    function Authorization() {
         $.ajax({
             type: "POST",
             url: "https://test.api.amadeus.com/v1/security/oauth2/token",
@@ -118,66 +137,85 @@
             },
             contentType: "application/x-www-form-urlencoded",
             success: function (result) {
-                var amadeusAccessToken = result.access_token;
-                $.ajax({
-                    type: "GET",
-                    dataType:'json',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'Bearer ' + amadeusAccessToken);
-                    },
-                    url: "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
-                       $.param({
-                            originLocationCode: $('#departurePicker option:selected').text(),
-                            destinationLocationCode: $('#destinationPicker option:selected').text(),
-                            departureDate: $('#departureDatePicker').val(),
-                            returnDate: $('#destinationDatePicker').val(),
-                            adults: 1,
-                            max: 10
-                            
-                       }),
-                    success: function (jsonResult) {
-                        var flightData = new Array();
-                       /* jsonResult = Object.keys(jsonResult)
-                            .reduce((res, key) => Object.assign(res, jsonResult[key]), {});
-                        debugger;*/
-                        jQuery.each(jsonResult.data, function (ID, flightRecord) {
-                            var flight = {
-                                departureAirport: $('#departurePicker option:selected').text(),
-                                departureDate: $('#departureDatePicker').val(),
-                                destinationAirport: $('#destinationPicker option:selected').text(),
-                                returnDate: $('#destinationDatePicker').val(),
-                                transferNumberDeparture: flightRecord.itineraries.length-1,
-                                transferNumberArrival: 0,
-                                passagers: flightRecord.numberOfBookableSeats,
-                                currency: $('#currencyPicker').val(),
-                                totalCost: parseFloat(flightRecord.price.total)
-                            };
-                            flightData.push(flight);
-                        });
-                        $.ajax({
-                            url: '@Url.Action("FilterData", "Home")',
-                            type: "POST",
-                            async: true,
-                            contentType: "application/json;charset=utf-8",
-                            data: JSON.stringify({ flightList: flightData }),
-                            success: function (flightView) {
-                                $('#resultTable').html(flightView);
-                            },
-                            error: function (e) {
-                                debugger;
-                                alert("Dogodila se greška tokom prikaza podataka.");
-                            }
-                        });
-                    },
-                    error: function (e) {
-                        alert("Nije moguće filtrirati po zadanim parametrima.");
-                    }
-                });
+                GetData(result.access_token);
             },
             error: function (error) {
-                alert("Nije moguće pristupiti servisu za autorizaciju.");
+                alert("Greška u autorizaciji.")
             }
         });
+    }
+</script>
+
+<script>  
+    $('#search').click(function (e) {
+        Authorization();
     });
+</script>
+
+<script>
+    function GetData(amadeusAccessToken) {
+         $.ajax({
+            async: true,
+            type: "GET",
+            dataType:'json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + amadeusAccessToken);
+            },
+            url: "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
+                $.param({
+                    originLocationCode: $('#departurePicker option:selected').text(),
+                    destinationLocationCode: $('#destinationPicker option:selected').text(),
+                    departureDate: $('#departureDatePicker').val(),
+                    returnDate: $('#destinationDatePicker').val(),
+                    adults: 1,
+                    max: 10
+                            
+                }),
+             success: function (jsonResult) {
+                 debugger;
+                var flightData = new Array();
+                /* jsonResult = Object.keys(jsonResult)
+                    .reduce((res, key) => Object.assign(res, jsonResult[key]), {});
+                debugger;*/
+                jQuery.each(jsonResult.data, function (ID, flightRecord) {
+                    var flight = {
+                        departureAirport: $('#departurePicker option:selected').text(),
+                        departureDate: $('#departureDatePicker').val(),
+                        destinationAirport: $('#destinationPicker option:selected').text(),
+                        returnDate: $('#destinationDatePicker').val(),
+                        transferNumberDeparture: flightRecord.itineraries.length-1,
+                        transferNumberArrival: 0,
+                        passagers: flightRecord.numberOfBookableSeats,
+                        currency: $('#currencyPicker').val(),
+                        totalCost: parseFloat(flightRecord.price.total)
+                    };
+                    flightData.push(flight);
+                }); 
+                debugger;
+                ShowData(flightData);
+            },
+            error: function (e) {
+                alert("Nije moguće filtrirati po zadanim parametrima.");
+            }
+        });
+    }
+</script>
+
+<script>
+    function ShowData(flightData) {
+        $.ajax({
+            url: '@Url.Action("FilterData", "Home")',
+            type: "POST",
+            async: true,
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({ flightList: flightData }),
+            success: function (flightView) {
+                $('#resultTable').html(flightView);
+            },
+            error: function (e) {
+                alert("Dogodila se greška tokom prikaza podataka.");
+            }
+        });
+    }
 </script>
 

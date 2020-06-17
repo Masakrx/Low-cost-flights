@@ -12,7 +12,8 @@ namespace Low_cost_flights
                         "~/Scripts/jquery-{version}.js",
                          "~/Scripts/jquery-ui-{version}.js",
                          "~/Scripts/tokenize2.js",
-                         "~/Scripts/chosen.jquery.min.js"));
+                         "~/Scripts/chosen.jquery.min.js"
+                         ));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
@@ -22,13 +23,15 @@ namespace Low_cost_flights
                "~/Scripts/daterangepicker.js"
            ));
 
+
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
+                      "~/Scripts/umd/popper.min.js",
+                      "~/Scripts/bootstrap.min.js",
                       "~/Scripts/bootstrap-multiselect.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
