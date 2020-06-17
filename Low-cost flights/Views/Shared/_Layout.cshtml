@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,9 @@
     @Scripts.Render("~/bundles/bootstrap")
 </head>
 <body>
-    <img src="~/loading.gif" id="loadingGIF" class="center-block" style="vertical-align:central;display:block"/>
-    <div class="container body-content">
+    <img src="~/loading.gif" id="loadingGIF" class="center-block" style="position:fixed;top:30%;left:40%;"/>
+    <div id="mainDiv" class="container body-content" hidden>
+        <br />
         @RenderBody()
     </div>
 

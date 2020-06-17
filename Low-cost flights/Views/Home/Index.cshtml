@@ -1,77 +1,106 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-<div id="mainDiv" style="position:center" hidden>    
-    <div style="margin-bottom: 20px;">
-        <label style="margin-right:5px;">Polazni aerodrom:</label>
-        <select class="Airport" style="display:inline-block; width:70px;" id="departurePicker"></select>
 
-        <label style="margin-left:10px;">Polazak:</label>
-        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:100px; display:inline-block" />
+<style>
+    .chosen-container {
+        /* This is the only width setting you'll need to change. */
+        width: 70px !important;
+        padding-bottom:5px !important;
+    }
+
+        .chosen-container .chzn-drop {
+            width: 70px !important;
+        }
+
+            .chosen-container .chzn-drop .chzn-search {
+                width: 98% !important;
+            }
+
+                .chosen-container .chzn-drop .chzn-search input {
+                    width: 98% !important;
+                }
+</style>
+
+<style>
+    .multiselect {
+        position: center;
+        display:inline-block;
+        max-width:70px;
+        text-align:center;  
+        margin-bottom:2px;
+    }
+
+</style>
+
+
+
+<div class="form-group" style="position:center">    
+    <div style="margin-bottom: 10px;position:center">
+        <label style="margin-right:5px;">Polazni aerodrom:</label>
+        <select class="chosen-container Airport" style="display: inline-block;" id="departurePicker"></select>
+
+        <label style="margin-left:10px;margin-right:5px;">Polazak:</label>
+        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:110px;height:25px;display:inline-block" />
+
 
         <label style="margin-right:5px;margin-left:10px;">Odredišni aerodrom:</label>
-        <select class="Airport" style="display:inline-block; width:70px;margin-left:10px;" id="destinationPicker"></select>
+        <select class="chosen-container Airport" style="display:inline-block;margin-left:10px;" id="destinationPicker"></select>
 
-        <label style="margin-left:10px;">Povratak:</label>
-        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:100px;display:inline-block" />
 
-        <label style="margin-left:10px;">Putnici:</label>
-        <select type="text" id="passagerNumberPicker" class="form-control">
-            <option id="1">10</option>
-            <option id="2">20</option>
-            <option id="3">30</option>
-        </select>
+        <label style="margin-left:10px;margin-right:5px;">Povratak:</label>
+        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:110px;height:25px;display:inline-block" />
+        
+        <label for="passagerNumberPicker" style="display:inline-block;margin-right:5px;margin-left:10px;">Putnici:</label>
+        <input type="text" style="width:50px;height:25px;display:inline-block;text-align:center;" id="passagerNumberPicker" class="form-control numbers" />
 
-        <label style="margin-left:10px;">Valuta:</label>
-        <select type="text" id="currencyPicker" class="form-control">
+        <label for="currencyPicker" style="margin-left: 10px; margin-right: 5px; display: inline-block">Valuta:</label>
+        <select type="text" id="currencyPicker" style="padding-right:10px;" class="form-control multiselect">
             <option id="1">USD</option>
             <option id="2">EUR</option>
             <option id="3">HRK</option>
         </select>
-        <button style="width:80px;margin-left:10px;" type="submit" class="btn navbar-btn btn-primary" name="search" id="search" value="search">Pretraži</button>
     </div>
-    <hr />
-    <div id="resultTable">
+    <div style="margin-bottom: 10px;position:center">
+        <div style="padding-bottom:10px;display:inline-block">
+            <button style=" width: 80px; height: 25px; padding: 0px;" type="submit" class="btn navbar-btn btn-primary" name="search" id="search">Pretraži</button>
+        </div>    
     </div>
+</div>
+<hr />
+<div id="resultTable">
+   
 </div>
 
 
 <script>
-    (function ($) {
+    (function ($) {  
         $(function () {
-            $("#passagerNumberPicker").multiselect({
-                buttonWidth: '70px'
-            });
-            $("#currencyPicker").multiselect({
-                buttonWidth: '70px'
-            }); 
-
             UpdateElements();
-           
-            
-        });
-        $(function () {
-            //$('#mainDiv').show();
-            //$('#loadingGIF').hide();
-        });
-        })(jQuery);
+            $("#currencyPicker").multiselect();
+            $('#mainDiv').removeAttr("hidden");
+        });      
+    })(jQuery);
 </script>
 
 <script>
     function UpdateElements() {
-        UpdateAirports().done(function () {
-            alert("UpdateAirports gotov");
-            UpdateDateRangePicker().done(function () {
-                alert("UpdateDateRangePicker gotov");
-            });
-        });
-        
+        UpdateAirports();
+        UpdateDateRangePicker();
+        $('#loadingGIF').hide();        
     }
+</script>
+
+<script>
+    jQuery('.numbers').keyup(function () {
+        this.value = this.value.replace(/[^0-9\.]/g, '');
+    });
 </script>
 
 
 <script>
     function UpdateAirports() {
+        var deferred = $.Deferred();
         var airportPicker = document.getElementsByClassName("Airport");
          $.ajax({
             url: '@Url.Action("GetCodes", "Home")',
@@ -82,46 +111,71 @@
              success: function (result) {
                  var codes = result.list;
                  jQuery.each(airportPicker, function (ID, picker) {
+                     $(picker).append($('<option value=""></option>'));  
                      jQuery.each(codes, function (ID, code) {
                          $(picker).append($("<option  id=" + code + " value=" + ID + 1 + ">"+code+"</option>"));                 
                      });
-                     $(picker).chosen();
-                 });   
-            },
-            error: function () {
+                     $(picker).chosen({
+                         placeholder_text_single: "...",
+                         no_results_text: 'Ne postoje podaci za '
+                     });
+                 }); 
+                 deferred.resolve();
+             },
+             error: function () {
+                deferred.resolve(false);
                 alert("Nije moguće očitati IATA kodove.");
-            }
+             }
          });
-        
+        return deferred;
     }
 </script>
 
 <script>
     function UpdateDateRangePicker() {
         var deferred = $.Deferred();
-        setTimeout(function () {
-            var pickers = document.getElementsByClassName("singleDatePickers");
-            jQuery.each(pickers, function (ID, picker) {
-                $(picker).daterangepicker({
-                    singleDatePicker: true,
-                    locale: {
-                        //format: 'DD.MM.YYYY.',
-                        format: 'YYYY-MM-DD',
-                        daysOfWeek: ["Ned", "Pon", "Uto",
-                            "Sri", "Čet", "Pet", "Sub"],
-                        monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
-                    },
-                    changeYear: true,
-                    changeMonth: true
-                });
+        var pickers = document.getElementsByClassName("singleDatePickers");
+        jQuery.each(pickers, function (ID, picker) {
+            $(picker).daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    //format: 'DD.MM.YYYY.',
+                    format: 'YYYY-MM-DD',
+                    daysOfWeek: ["Ned", "Pon", "Uto",
+                        "Sri", "Čet", "Pet", "Sub"],
+                    monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
+                },
+                changeYear: true,
+                changeMonth: true
             });
-            deferred.resolve();
-        }, 1000);
-
-        return $.when(deferred).done(function(){}).promise();
-        
-
+        });
+        deferred.resolve();
+        return deferred;
     }
+</script>
+
+<script>
+    $('.Airport').change(function (event) {
+        var picker = event.target.id;
+        var optionID = event.target.value;
+        //var selectedValue = $("option:selected", this).attr("id");
+        if (picker == "departurePicker") {
+            jQuery.each($('#destinationPicker option:disabled'), function (ID, option) {
+                $('#destinationPicker option[id=' + option.id + ']').prop("disabled", false);
+                $('#destinationPicker').trigger("chosen:updated");
+            });
+            $('#destinationPicker option[value=' + optionID + ']').prop("disabled", true);
+            $('#destinationPicker').trigger("chosen:updated");
+        }
+        else if (picker == "destinationPicker") {
+            jQuery.each($('#departurePicker option:disabled'), function (ID, picker) {
+                $('#departurePicker option[id=' + option.id + ']').prop("disabled", false);
+                $('#departurePicker').trigger("chosen:updated");
+            });
+            $('#departurePicker option[value=' + optionID + ']').prop("disabled", true);
+            $('#departurePicker').trigger("chosen:updated");
+        }
+    });
 </script>
 
 <script>
@@ -146,15 +200,30 @@
     }
 </script>
 
+
+
 <script>  
     $('#search').click(function (e) {
         Authorization();
+        $('#resultTable').hide();
+        $('#loadingGIF').show();
     });
 </script>
 
 <script>
     function GetData(amadeusAccessToken) {
-         $.ajax({
+        var test = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
+            $.param({
+                originLocationCode: $('#departurePicker option:selected').text(),
+                destinationLocationCode: $('#destinationPicker option:selected').text(),
+                departureDate: $('#departureDatePicker').val(),
+                returnDate: $('#destinationDatePicker').val(),
+                currencyCode: $('#currencyPicker').val(),
+                adults: $('#passagerNumberPicker').val(),
+                max: 10
+
+            });
+        $.ajax({
             async: true,
             type: "GET",
             dataType:'json',
@@ -167,31 +236,29 @@
                     destinationLocationCode: $('#destinationPicker option:selected').text(),
                     departureDate: $('#departureDatePicker').val(),
                     returnDate: $('#destinationDatePicker').val(),
-                    adults: 1,
-                    max: 10
+                    currencyCode: $('#currencyPicker').val(),
+                    adults: $('#passagerNumberPicker').val(),
+                    max: 100,
+                    nonStop: true
                             
                 }),
-             success: function (jsonResult) {
-                 debugger;
+            success: function (jsonResult) {
+                debugger;
                 var flightData = new Array();
-                /* jsonResult = Object.keys(jsonResult)
-                    .reduce((res, key) => Object.assign(res, jsonResult[key]), {});
-                debugger;*/
                 jQuery.each(jsonResult.data, function (ID, flightRecord) {
                     var flight = {
                         departureAirport: $('#departurePicker option:selected').text(),
                         departureDate: $('#departureDatePicker').val(),
                         destinationAirport: $('#destinationPicker option:selected').text(),
                         returnDate: $('#destinationDatePicker').val(),
-                        transferNumberDeparture: flightRecord.itineraries.length-1,
-                        transferNumberArrival: 0,
-                        passagers: flightRecord.numberOfBookableSeats,
+                        transferNumberDeparture: flightRecord.itineraries[0].segments.length-1,
+                        transferNumberArrival: flightRecord.itineraries[1].segments.length-1,
+                        passagers: $('#passagerNumberPicker').val(),//flightRecord.numberOfBookableSeats,
                         currency: $('#currencyPicker').val(),
                         totalCost: parseFloat(flightRecord.price.total)
                     };
                     flightData.push(flight);
                 }); 
-                debugger;
                 ShowData(flightData);
             },
             error: function (e) {
@@ -210,7 +277,10 @@
             contentType: "application/json;charset=utf-8",
             data: JSON.stringify({ flightList: flightData }),
             success: function (flightView) {
+                debugger;
                 $('#resultTable').html(flightView);
+                $('#loadingGIF').hide();
+                $('#resultTable').show();
             },
             error: function (e) {
                 alert("Dogodila se greška tokom prikaza podataka.");

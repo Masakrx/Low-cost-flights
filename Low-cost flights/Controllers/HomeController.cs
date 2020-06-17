@@ -22,7 +22,7 @@ namespace Low_cost_flights.Controllers
             return Json(new { list = codes }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult FilterData(List<FlightData> flightList)
+        public PartialViewResult FilterData(List<FlightData> flightList)
         {
             flightCollection = new List<FlightData>();
             if (flightList != null)
@@ -33,7 +33,7 @@ namespace Low_cost_flights.Controllers
                     flightCollection.Add(item);
                 }
             }
-            return View("FlightView", flightCollection);
+            return PartialView("FlightView", flightCollection);
 
         }
 
