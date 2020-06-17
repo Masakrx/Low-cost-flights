@@ -12,8 +12,8 @@ namespace Low_cost_flights
                         "~/Scripts/jquery-{version}.js",
                          "~/Scripts/jquery-ui-{version}.js",
                          "~/Scripts/tokenize2.js",
-                         "~/Scripts/chosen.jquery.min.js"
-                         ));
+                         "~/Scripts/chosen.jquery.min.js",
+                         "~/Scripts/date.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));

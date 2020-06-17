@@ -21,35 +21,36 @@
 }
 else
 {
-    <table class="table table-bordered table-condensed table-striped text-center" runat="server" id="detailTable" style="position:center">
+    <table class="table table-bordered table-condensed table-striped text-center" runat="server" id="detailTable" style="position:center;">
         <tr>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Polazni aerodrom
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Odredišni aerodrom
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Datum polaska
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Datum povratka
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
-                Presjedanja u odlasku
+            <th colspan="2" class="text-center" style="text-align:center;vertical-align:middle">
+                Presjedanja
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
-                Presjedanja u dolasku
-            </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Putnici
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Valuta
             </th>
-            <th class="text-center" style="text-align:center;vertical-align:middle">
+            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Cijena
             </th>
+        </tr>
+        <tr>
+            <th>Dolazak</th>
+            <th>Odlazak</th>
         </tr>
         @foreach (var item in Model)
         {
@@ -61,12 +62,10 @@ else
                     @Html.DisplayFor(modelItem => item.destinationAirport)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
-                    @{ var departureDate = item.departureDate.ToString("dd.MM.yyyy."); }
-                    @Html.DisplayFor(modelItem => departureDate)
+                    @Html.DisplayFor(modelItem => item.departureDate)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
-                    @{ var returnDate = item.returnDate.ToString("dd.MM.yyyy."); }
-                    @Html.DisplayFor(modelItem => returnDate)
+                      @Html.DisplayFor(modelItem => item.returnDate)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
                     @Html.DisplayFor(modelItem => item.transferNumberDeparture)
@@ -84,7 +83,7 @@ else
                     @Html.DisplayFor(modelItem => item.totalCost)
                 </td>
             </tr>
-         }
+        }
     </table>
 }
 

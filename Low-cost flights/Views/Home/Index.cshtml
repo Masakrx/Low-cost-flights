@@ -35,7 +35,7 @@
 
 
 
-<div class="form-group" style="position:center">    
+<div class="form-group" style="position:center;margin-left:20%;margin-left:20%">    
     <div style="margin-bottom: 10px;position:center">
         <label style="margin-right:5px;">Polazni aerodrom:</label>
         <select class="chosen-container Airport" style="display: inline-block;" id="departurePicker"></select>
@@ -50,7 +50,7 @@
 
         <label style="margin-left:10px;margin-right:5px;">Povratak:</label>
         <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:110px;height:25px;display:inline-block" />
-        
+
         <label for="passagerNumberPicker" style="display:inline-block;margin-right:5px;margin-left:10px;">Putnici:</label>
         <input type="text" style="width:50px;height:25px;display:inline-block;text-align:center;" id="passagerNumberPicker" class="form-control numbers" />
 
@@ -60,12 +60,10 @@
             <option id="2">EUR</option>
             <option id="3">HRK</option>
         </select>
-    </div>
-    <div style="margin-bottom: 10px;position:center">
-        <div style="padding-bottom:10px;display:inline-block">
+        <div style="padding-bottom:10px;padding-left:10px;display:inline-block">
             <button style=" width: 80px; height: 25px; padding: 0px;" type="submit" class="btn navbar-btn btn-primary" name="search" id="search">Pretraži</button>
-        </div>    
-    </div>
+        </div>
+    </div>   
 </div>
 <hr />
 <div id="resultTable">
@@ -212,17 +210,6 @@
 
 <script>
     function GetData(amadeusAccessToken) {
-        var test = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
-            $.param({
-                originLocationCode: $('#departurePicker option:selected').text(),
-                destinationLocationCode: $('#destinationPicker option:selected').text(),
-                departureDate: $('#departureDatePicker').val(),
-                returnDate: $('#destinationDatePicker').val(),
-                currencyCode: $('#currencyPicker').val(),
-                adults: $('#passagerNumberPicker').val(),
-                max: 10
-
-            });
         $.ajax({
             async: true,
             type: "GET",
@@ -238,33 +225,94 @@
                     returnDate: $('#destinationDatePicker').val(),
                     currencyCode: $('#currencyPicker').val(),
                     adults: $('#passagerNumberPicker').val(),
-                    max: 100,
-                    nonStop: true
+                    max: 10,
                             
                 }),
             success: function (jsonResult) {
-                debugger;
+
+                //download JSON file
+                //DownloadJSON(jsonResult);
+                
                 var flightData = new Array();
-                jQuery.each(jsonResult.data, function (ID, flightRecord) {
+                /*for (var i = 0; i < jsonResult.data.length; i++) {
+                    var brojLetova = jsonResult.data[i].itineraries.length;
+                    var departureTime = jsonResult.data[i].itineraries[0].segments[0].departure.at.split('T').pop();
+                    var destinationTime = jsonResult.data[i].itineraries[1].segments[0].departure.at.split('T').pop();
+                    debugger;
                     var flight = {
                         departureAirport: $('#departurePicker option:selected').text(),
-                        departureDate: $('#departureDatePicker').val(),
+                        departureDate: $('#departureDatePicker').val() + " " + departureTime,
                         destinationAirport: $('#destinationPicker option:selected').text(),
-                        returnDate: $('#destinationDatePicker').val(),
+                        returnDate: $('#destinationDatePicker').val() +" " + destinationTime,
+                        transferNumberDeparture: jsonResult.data[i].itineraries[0].segments.length-1,
+                        transferNumberArrival: jsonResult.data[i].itineraries[1].segments.length-1,
+                        passagers: $('#passagerNumberPicker').val(),//flightRecord.numberOfBookableSeats,
+                        currency: $('#currencyPicker').val(),
+                        totalCost: parseFloat(jsonResult.data[i].price.total)
+                    };
+                    flightData.push(flight);
+                }*/
+                jQuery.each(jsonResult.data, function (ID, flightRecord) {
+                    //var departureDateTime = flightRecord.itineraries[0].segments[0].departure.at.split('T');
+                    //var destinationDateTime = flightRecord.itineraries[1].segments[0].departure.at.split('T');
+                    /*var departureAirport = flightRecord.itineraries[0].segments[0].departure.iataCode;
+                    var destinationAirport = flightRecord.itineraries[1].segments[0].departure.iataCode;
+                    var departureDateTime = flightRecord.itineraries[0].segments[0].departure.at.split('T');
+                    var destinationDateTime = flightRecord.itineraries[1].segments[0].departure.at.split('T');
+                    var transferNumberDeparture = flightRecord.itineraries[0].segments.length - 1;
+                    var transferNumberArrival = flightRecord.itineraries[1].segments.length - 1;
+                    var currency = flightRecord.price.currency;
+                    var totalCost = flightRecord.price.grandTotal;
+                    var passagers = flightRecord.travelerPricings.length;*/
+                    //var x1 = new Date(Date.parse(flightRecord.itineraries[0].segments[0].departure.at)).toString();
+                    //var x2 = new Date(Date.parse(flightRecord.itineraries[1].segments[0].departure.at)).toString();
+                    flightData.push({
+                        departureAirport: flightRecord.itineraries[0].segments[0].departure.iataCode,
+                        destinationAirport: flightRecord.itineraries[1].segments[0].departure.iataCode,
+                        departureDateTime: new Date(Date.parse(flightRecord.itineraries[0].segments[0].departure.at)).toString(),
+                        destinationDateTime: new Date(Date.parse(flightRecord.itineraries[1].segments[0].departure.at)).toString(),
+                        transferNumberDeparture: flightRecord.itineraries[0].segments.length - 1,
+                        transferNumberArrival: flightRecord.itineraries[1].segments.length - 1,
+                        currency: flightRecord.price.currency,
+                        totalCost: parseFloat(flightRecord.price.grandTotal),
+                        passagers: flightRecord.travelerPricings.length
+                    });
+                    //var departureTime = flightRecord.itineraries[0].segments[0].departure.at.split('T').pop();
+                    //var destinationTime = flightRecord.itineraries[1].segments[0].departure.at.split('T').pop();
+                    /*var flight = {
+                        departureAirport: $('#departurePicker option:selected').text(),
+                        departureDate: $('#departureDatePicker').val() + " " + departureTime,
+                        destinationAirport: $('#destinationPicker option:selected').text(),
+                        returnDate: $('#destinationDatePicker').val() + " " + destinationTime,
                         transferNumberDeparture: flightRecord.itineraries[0].segments.length-1,
                         transferNumberArrival: flightRecord.itineraries[1].segments.length-1,
                         passagers: $('#passagerNumberPicker').val(),//flightRecord.numberOfBookableSeats,
                         currency: $('#currencyPicker').val(),
                         totalCost: parseFloat(flightRecord.price.total)
                     };
-                    flightData.push(flight);
-                }); 
+                    flightData.push(flight);*/
+                });
                 ShowData(flightData);
+                
             },
             error: function (e) {
                 alert("Nije moguće filtrirati po zadanim parametrima.");
             }
         });
+    }
+</script>
+
+<script>
+    function DownloadJSON(jsonResult) {
+        const filename = 'data.json';
+        const jsonStr = JSON.stringify(jsonResult.data);
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     }
 </script>
 

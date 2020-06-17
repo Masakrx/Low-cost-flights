@@ -8,10 +8,10 @@ namespace Low_cost_flights.Models
     public class FlightData : DbContext
     {
         public string departureAirport { get; set; }
-        public DateTime departureDate { get; set; }
+        public string departureDate { get; set; }
         public int transferNumberDeparture { get; set; }
         public string destinationAirport { get; set; }        
-        public DateTime returnDate { get; set; }       
+        public string returnDate { get; set; }       
         public int transferNumberArrival { get; set; }
         public int passagers { get; set; }
         public string currency { get; set; }
