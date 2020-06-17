@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Low_cost_flights.Models.FlightData>
+@{
+    ViewBag.Title = "Flight data";
+
+}
+
+@Scripts.Render("~/bundles/modernizr")
+
+<style type="text/css">
+    .content {
+        text-align: center;
+    }
+
+    .inner {
+        display: inline-block;
+    }
+</style>
+@if (Model == null || Model.Count() == 0)
+{
+    <i style="display:block;text-align:center;">Nema rezultata</i>
+}
+else
+{
+    <table class="table table-bordered table-condensed table-striped text-center" runat="server" id="detailTable" style="position:center">
+        <tr>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Polazni aerodrom
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Odredišni aerodrom
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Datum polaska
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Datum povratka
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Presjedanja u odlasku
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Presjedanja u dolasku
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Broj putnika
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Valuta
+            </th>
+            <th class="text-center" style="text-align:center;vertical-align:middle">
+                Ukupna cijena
+            </th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr style="vertical-align:middle;">
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.departureAirport)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.destinationAirport)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @{ var departureDate = item.departureDate.ToString("dd.MM.yyyy."); }
+                    @Html.DisplayFor(modelItem => departureDate)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @{ var returnDate = item.returnDate.ToString("dd.MM.yyyy."); }
+                    @Html.DisplayFor(modelItem => returnDate)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.transferNumberDeparture)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.transferNumberArrival)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.passagers)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.currency)
+                </td>
+                <td style="text-align:center;vertical-align:middle">
+                    @Html.DisplayFor(modelItem => item.totalCost)
+                </td>
+            </tr>
+         }
+    </table>
+}
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+
+@Styles.Render("~/Content/css")
