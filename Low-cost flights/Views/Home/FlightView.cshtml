@@ -18,6 +18,7 @@
     .inner {
         display: inline-block;
     }
+
     .flightView tr {
         line-height: 12px;
     }
@@ -91,23 +92,26 @@ else
 
 @if (Model != null && Model.Count() != 0)
 {
-    <div id="paginationFlightView" style="margin-bottom:80px;">
-        <div class="pull-right">
-            <div class="top pull-right">
-                <label style="font-weight:normal;padding-right:10px;">
-                    Zapisi po stranici:
-                    <select class="mdb-select md-form multiselect" id="elementsPerPage">
-                        <option id="10" value="10">10</option>
-                        <option id="20" value="20">20</option>
-                        <option id="50" value="50">50</option>
-                    </select>
-                </label>
-            </div>
+<div id="paginationFlightView">
+    <div style="position:absolute;left:50%">
+        <div style="position: relative; left: -50%;">
+            @Html.PagedListPager(Model, page => Url.Action("GetFlightViewPage", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
         </div>
-        <label class="top pull-left" style="font-weight:normal;padding-left:10px;">@Model.Count() od @HomeController.elementsPerPage zapisa </label>
-        @Html.PagedListPager(Model, page => Url.Action("GetFlightViewPage", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
     </div>
+    <label style="font-weight:normal;padding-left:10px;">@Model.Count() od @HomeController.elementsPerPage zapisa </label>
+    <label style="font-weight:normal;margin-right:10px; position:relative;float:right">
+        Zapisi po stranici:
+        <select class="mdb-select md-form multiselect" id="elementsPerPage">
+            <option id="10" value="10">10</option>
+            <option id="20" value="20">20</option>
+            <option id="50" value="50">50</option>
+        </select>
+    </label>
+
+
+</div>
 }
+
 
 
 

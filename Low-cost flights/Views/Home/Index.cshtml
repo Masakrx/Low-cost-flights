@@ -2,34 +2,20 @@
     ViewBag.Title = "Home Page";
 }
 
-<style>
-    .multiselect {
-        position: center;
-        display: inline-block;
-        max-width: 70px;
-        text-align: center;
-        margin-bottom: 2px;
-    }
+<style>   
     .btn-group{
-        width:10px;
-    }
-
-    #container {
-        display: flex;
-    }
-
-    .right-float {
-        margin-left: auto;
+        width:80px;
+        min-height:25px;
+        padding-bottom:2px;
     }
 
     .chosen-container {
         /* This is the only width setting you'll need to change. */
-        width: 92px !important;
+        width: 120px !important;
         padding-bottom: 5px !important;
     }
-
         .chosen-container .chzn-drop {
-            width: 92px !important;
+            width: 120px !important;
         }
 
             .chosen-container .chzn-drop .chzn-search {
@@ -42,12 +28,13 @@
 </style>
 
 <div class="form-group" style="position:center;">
-    <div style="margin-bottom: 10px;position:center">
+    <div style="margin-bottom: 10px;position:center;display:inline-block">
+
         <label style="margin-right:5px;">Polazni aerodrom:</label>
-        <select class="chosen-container Airport" style="display: inline-block;" id="departurePicker"></select>
+        <select class="chosen-container  Airport" style="display: inline-block;" id="departurePicker"></select>
 
         <label style="margin-left:10px;margin-right:5px;">Polazak:</label>
-        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:110px;height:25px;display:inline-block" />
+        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:120px;height:25px;display:inline-block;text-align:center" />
 
 
         <label style="margin-right:5px;margin-left:10px;">Odredišni aerodrom:</label>
@@ -55,25 +42,42 @@
 
 
         <label style="margin-left:10px;margin-right:5px;">Povratak:</label>
-        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:110px;height:25px;display:inline-block" />
-
-        <label for="passagerNumberPicker" style="display:inline-block;margin-right:5px;margin-left:10px;">Putnici:</label>
-        <input type="text" style="width:50px;height:25px;display:inline-block;text-align:center;" id="passagerNumberPicker" class="form-control numbers" />
+        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:120px;height:25px;display:inline-block;text-align:center" />
 
         <label for="currencyPicker" style="margin-left:5px; display:inline-block">Valuta:</label>
-        <select type="submit" id="currencyPicker" style="display:inline-block; width:20px;">
+        <select  type="submit" id="currencyPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
             <option id="1">USD</option>
             <option id="2">EUR</option>
             <option id="3">HRK</option>
         </select>
-        <div id="container" style="padding-bottom:10px;padding-left:10px;display:inline-block">
-            <button style=" width: 80px; height: 25px; padding: 0px;" type="submit" class="btn navbar-btn btn-primary search right-float"    name="search" id="search">Pretraži</button>
+
+    </div>
+    <div style="margin-bottom:10px;position:center;display:inline-block">
+
+        <label for="adultsNumberPicker" style="margin-right:5px;">Odrasli (12+):</label>
+        <div class="quantity buttons_added border">
+            <input type="button" onclick="GetMaxInfants()" value="-" class="minus border"><input id="adultsNumberPicker" type="number" step="1" min="1" name="adultsQuantity" value="1" class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
+        </div>
+
+        <label for="childrenNumberPicker" style="margin-right:5px;margin-left:10px;">Djeca (2-12):</label>
+        <div class="quantity buttons_added border">
+            <input type="button" value="-" class="minus border"><input id="childrenNumberPicker" type="number" step="1" min="0" name="childrenQuantity" value="1"  class="input-text qty text" size="4" ><input type="button" value="+" class="plus border">
+        </div>
+
+        <label for="infantsNumberPicker" style="margin-right:5px;margin-left:10px;">Novorođenčad (0-2):</label>
+        <div class="quantity buttons_added border">
+            <input onclick="GetMaxInfants()" type="button" value="-" class="minus border"><input id="infantsNumberPicker" type="number" step="1" min="0" name="infantsQuantity" value="0"  class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
     </div>
+    <div style="position:relative;float:right;padding-right:10px;margin-bottom:10px;">
+        <button style="width:80px;height:25px;padding:0px;" type="submit" class="btn btn-primary" name="search" id="search">Pretraži</button>
+    </div>
+    <hr class="form-group form-inline" style="margin-top: 20px;" />
 </div>
-<hr />
-<div id="resultTable">
 
+<img src="~/loading.gif" id="reloadGIF" class="center-block" style="position:fixed;top:30%;left:40%;" />
+<div id="resultTable">
+    
 </div>
 
 
@@ -92,15 +96,22 @@
         UpdateAirports();
         UpdateDateRangePicker();
         $('#loadingGIF').hide();
+        $('#reloadGIF').hide();
     }
 </script>
 
-<script>
-    jQuery('.numbers').keyup(function () {
-        this.value = this.value.replace(/[^0-9\.]/g, '');
-    });
-</script>
 
+<script>
+    function GetMaxInfants() {
+
+        var infantPicker = document.getElementById("infantsNumberPicker");
+        var x = $('#adultsNumberPicker').val();
+        //$('#infantsNumberPicker').val(0);
+
+        infantPicker.setAttribute('max', $('#adultsNumberPicker').val());
+        
+    }
+</script>
 <!--Skripta koja sluzi da se ukljuci checkbox sve stranice ako postoji samo jedna stranica (radi printanja)-->
 <script>
     function PageNumberSetup() {
@@ -149,15 +160,14 @@
         jQuery.each(pickers, function (ID, picker) {
             $(picker).daterangepicker({
                 singleDatePicker: true,
-                locale: {
-                    //format: 'DD.MM.YYYY.',
-                    format: 'YYYY-MM-DD',
+                locale: {                  
+                    format: 'DD.MM.YYYY.',
                     daysOfWeek: ["Ned", "Pon", "Uto",
                         "Sri", "Čet", "Pet", "Sub"],
                     monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
                 },
                 changeYear: true,
-                changeMonth: true
+                changeMonth: true,
             });
         });
         deferred.resolve();
@@ -216,25 +226,19 @@
 <script>
     $('#search').click(function (e) {
         Authorization();
+        $('#reloadGIF').show();
         $('#resultTable').hide();
-        $('#loadingGIF').show();
+        
     });
 </script>
 
 <script>
     function GetData(amadeusAccessToken) {
-        /*var test = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
-            $.param({
-                originLocationCode: $('#departurePicker option:selected').text(),
-                destinationLocationCode: $('#destinationPicker option:selected').text(),
-                departureDate: $('#departureDatePicker').val(),
-                returnDate: $('#destinationDatePicker').val(),
-                currencyCode: $('#currencyPicker').val(),
-                adults: $('#passagerNumberPicker').val()//,
-                //max: 10,
-
-            });*/
-        var testPreview = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2020-08-01&returnDate=2020-08-05&adults=2&max=100";
+        //var testPreview = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2020-08-01&returnDate=2020-08-05&adults=2&max=100";
+        var departureDateTemp = $('#departureDatePicker').val().slice(0, -1).toString().split('.');
+        var departureDate = departureDateTemp[2] + "-" + departureDateTemp[1] + "-" + departureDateTemp[0];
+        var destinationDateTemp = $('#destinationDatePicker').val().slice(0, -1).toString().split('.');
+        var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];
         $.ajax({
             async: true,
             type: "GET",
@@ -246,10 +250,12 @@
                 $.param({
                     originLocationCode: $('#departurePicker option:selected').text(),
                     destinationLocationCode: $('#destinationPicker option:selected').text(),
-                    departureDate: $('#departureDatePicker').val(),
-                    returnDate: $('#destinationDatePicker').val(),
+                    departureDate: departureDate,
+                    returnDate: returnDate,
                     currencyCode: $('#currencyPicker').val(),
-                    adults: $('#passagerNumberPicker').val(),
+                    adults: $('#adultsNumberPicker').val(),
+                    children: $('#childrenNumberPicker').val(),
+                    infants: $('#infantsNumberPicker').val(),
                     max: 250
 
                 }),
@@ -277,6 +283,7 @@
             },
             error: function (e) {
                 alert("Nije moguće filtrirati po zadanim parametrima.");
+                $('#reloadGIF').hide();
             }
         });
     }
@@ -307,11 +314,12 @@
             success: function (flightView) {
                 PageNumberSetup();
                 $('#resultTable').html(flightView);
-                $('#loadingGIF').hide();
+                $('#reloadGIF').hide();
                 $('#resultTable').show();
             },
             error: function (e) {
                 alert("Dogodila se greška tokom prikaza podataka.");
+                $('#reloadGIF').hide();
             }
         });
     }

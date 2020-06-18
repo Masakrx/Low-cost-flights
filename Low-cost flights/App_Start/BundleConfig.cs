@@ -13,7 +13,8 @@ namespace Low_cost_flights
                          "~/Scripts/jquery-ui-{version}.js",
                          "~/Scripts/tokenize2.js",
                          "~/Scripts/chosen.jquery.min.js",
-                         "~/Scripts/date.js"));
+                         "~/Scripts/date.js",
+                         "~/Scripts/quanitity.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
@@ -40,7 +41,9 @@ namespace Low_cost_flights
                       "~/Content/site.css",
                       "~/Content/jquery-ui.css",
                       "~/Content/tokenize2.css",
-                      "~/Content/chosen.min.css"));
+                      "~/Content/chosen.min.css",
+                      "~/Content/PagedList.css",
+                      "~/Content/quantity.css"));
 
             bundles.Add(new StyleBundle("~/bundles/daterangepickerCSS").Include(
                 "~/Content/daterangepicker.css"
