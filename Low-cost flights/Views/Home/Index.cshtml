@@ -3,14 +3,33 @@
 }
 
 <style>
+    .multiselect {
+        position: center;
+        display: inline-block;
+        max-width: 70px;
+        text-align: center;
+        margin-bottom: 2px;
+    }
+    .btn-group{
+        width:10px;
+    }
+
+    #container {
+        display: flex;
+    }
+
+    .right-float {
+        margin-left: auto;
+    }
+
     .chosen-container {
         /* This is the only width setting you'll need to change. */
-        width: 70px !important;
-        padding-bottom:5px !important;
+        width: 92px !important;
+        padding-bottom: 5px !important;
     }
 
         .chosen-container .chzn-drop {
-            width: 70px !important;
+            width: 92px !important;
         }
 
             .chosen-container .chzn-drop .chzn-search {
@@ -22,20 +41,7 @@
                 }
 </style>
 
-<style>
-    .multiselect {
-        position: center;
-        display:inline-block;
-        max-width:70px;
-        text-align:center;  
-        margin-bottom:2px;
-    }
-
-</style>
-
-
-
-<div class="form-group" style="position:center;margin-left:20%;margin-left:20%">    
+<div class="form-group" style="position:center;">
     <div style="margin-bottom: 10px;position:center">
         <label style="margin-right:5px;">Polazni aerodrom:</label>
         <select class="chosen-container Airport" style="display: inline-block;" id="departurePicker"></select>
@@ -54,30 +60,30 @@
         <label for="passagerNumberPicker" style="display:inline-block;margin-right:5px;margin-left:10px;">Putnici:</label>
         <input type="text" style="width:50px;height:25px;display:inline-block;text-align:center;" id="passagerNumberPicker" class="form-control numbers" />
 
-        <label for="currencyPicker" style="margin-left: 10px; margin-right: 5px; display: inline-block">Valuta:</label>
-        <select type="text" id="currencyPicker" style="padding-right:10px;" class="form-control multiselect">
+        <label for="currencyPicker" style="margin-left:5px; display:inline-block">Valuta:</label>
+        <select type="submit" id="currencyPicker" style="display:inline-block; width:20px;">
             <option id="1">USD</option>
             <option id="2">EUR</option>
             <option id="3">HRK</option>
         </select>
-        <div style="padding-bottom:10px;padding-left:10px;display:inline-block">
-            <button style=" width: 80px; height: 25px; padding: 0px;" type="submit" class="btn navbar-btn btn-primary" name="search" id="search">Pretraži</button>
+        <div id="container" style="padding-bottom:10px;padding-left:10px;display:inline-block">
+            <button style=" width: 80px; height: 25px; padding: 0px;" type="submit" class="btn navbar-btn btn-primary search right-float"    name="search" id="search">Pretraži</button>
         </div>
-    </div>   
+    </div>
 </div>
 <hr />
 <div id="resultTable">
-   
+
 </div>
 
 
 <script>
-    (function ($) {  
+    (function ($) {
         $(function () {
             UpdateElements();
             $("#currencyPicker").multiselect();
             $('#mainDiv').removeAttr("hidden");
-        });      
+        });
     })(jQuery);
 </script>
 
@@ -85,7 +91,7 @@
     function UpdateElements() {
         UpdateAirports();
         UpdateDateRangePicker();
-        $('#loadingGIF').hide();        
+        $('#loadingGIF').hide();
     }
 </script>
 
@@ -93,6 +99,13 @@
     jQuery('.numbers').keyup(function () {
         this.value = this.value.replace(/[^0-9\.]/g, '');
     });
+</script>
+
+<!--Skripta koja sluzi da se ukljuci checkbox sve stranice ako postoji samo jedna stranica (radi printanja)-->
+<script>
+    function PageNumberSetup() {
+        $('#paginationFlightView').prop('hidden', false);
+    }
 </script>
 
 
@@ -109,15 +122,15 @@
              success: function (result) {
                  var codes = result.list;
                  jQuery.each(airportPicker, function (ID, picker) {
-                     $(picker).append($('<option value=""></option>'));  
+                     $(picker).append($('<option value=""></option>'));
                      jQuery.each(codes, function (ID, code) {
-                         $(picker).append($("<option  id=" + code + " value=" + ID + 1 + ">"+code+"</option>"));                 
+                         $(picker).append($("<option  id=" + code + " value=" + ID + 1 + ">"+code+"</option>"));
                      });
                      $(picker).chosen({
-                         placeholder_text_single: "...",
-                         no_results_text: 'Ne postoje podaci za '
+                         placeholder_text_single: "Odaberi...",
+                         no_results_text: 'Ne postoje rezultati za '
                      });
-                 }); 
+                 });
                  deferred.resolve();
              },
              error: function () {
@@ -200,7 +213,7 @@
 
 
 
-<script>  
+<script>
     $('#search').click(function (e) {
         Authorization();
         $('#resultTable').hide();
@@ -210,10 +223,22 @@
 
 <script>
     function GetData(amadeusAccessToken) {
+        /*var test = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
+            $.param({
+                originLocationCode: $('#departurePicker option:selected').text(),
+                destinationLocationCode: $('#destinationPicker option:selected').text(),
+                departureDate: $('#departureDatePicker').val(),
+                returnDate: $('#destinationDatePicker').val(),
+                currencyCode: $('#currencyPicker').val(),
+                adults: $('#passagerNumberPicker').val()//,
+                //max: 10,
+
+            });*/
+        var testPreview = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2020-08-01&returnDate=2020-08-05&adults=2&max=100";
         $.ajax({
             async: true,
             type: "GET",
-            dataType:'json',
+            dataType: 'json',
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + amadeusAccessToken);
             },
@@ -225,75 +250,30 @@
                     returnDate: $('#destinationDatePicker').val(),
                     currencyCode: $('#currencyPicker').val(),
                     adults: $('#passagerNumberPicker').val(),
-                    max: 10,
-                            
+                    max: 250
+
                 }),
             success: function (jsonResult) {
-
                 //download JSON file
                 //DownloadJSON(jsonResult);
-                
+
                 var flightData = new Array();
-                /*for (var i = 0; i < jsonResult.data.length; i++) {
-                    var brojLetova = jsonResult.data[i].itineraries.length;
-                    var departureTime = jsonResult.data[i].itineraries[0].segments[0].departure.at.split('T').pop();
-                    var destinationTime = jsonResult.data[i].itineraries[1].segments[0].departure.at.split('T').pop();
-                    debugger;
-                    var flight = {
-                        departureAirport: $('#departurePicker option:selected').text(),
-                        departureDate: $('#departureDatePicker').val() + " " + departureTime,
-                        destinationAirport: $('#destinationPicker option:selected').text(),
-                        returnDate: $('#destinationDatePicker').val() +" " + destinationTime,
-                        transferNumberDeparture: jsonResult.data[i].itineraries[0].segments.length-1,
-                        transferNumberArrival: jsonResult.data[i].itineraries[1].segments.length-1,
-                        passagers: $('#passagerNumberPicker').val(),//flightRecord.numberOfBookableSeats,
-                        currency: $('#currencyPicker').val(),
-                        totalCost: parseFloat(jsonResult.data[i].price.total)
-                    };
-                    flightData.push(flight);
-                }*/
                 jQuery.each(jsonResult.data, function (ID, flightRecord) {
-                    //var departureDateTime = flightRecord.itineraries[0].segments[0].departure.at.split('T');
-                    //var destinationDateTime = flightRecord.itineraries[1].segments[0].departure.at.split('T');
-                    /*var departureAirport = flightRecord.itineraries[0].segments[0].departure.iataCode;
-                    var destinationAirport = flightRecord.itineraries[1].segments[0].departure.iataCode;
-                    var departureDateTime = flightRecord.itineraries[0].segments[0].departure.at.split('T');
-                    var destinationDateTime = flightRecord.itineraries[1].segments[0].departure.at.split('T');
-                    var transferNumberDeparture = flightRecord.itineraries[0].segments.length - 1;
-                    var transferNumberArrival = flightRecord.itineraries[1].segments.length - 1;
-                    var currency = flightRecord.price.currency;
-                    var totalCost = flightRecord.price.grandTotal;
-                    var passagers = flightRecord.travelerPricings.length;*/
-                    //var x1 = new Date(Date.parse(flightRecord.itineraries[0].segments[0].departure.at)).toString();
-                    //var x2 = new Date(Date.parse(flightRecord.itineraries[1].segments[0].departure.at)).toString();
                     flightData.push({
                         departureAirport: flightRecord.itineraries[0].segments[0].departure.iataCode,
                         destinationAirport: flightRecord.itineraries[1].segments[0].departure.iataCode,
-                        departureDateTime: new Date(Date.parse(flightRecord.itineraries[0].segments[0].departure.at)).toString(),
-                        destinationDateTime: new Date(Date.parse(flightRecord.itineraries[1].segments[0].departure.at)).toString(),
+                        departureDateTime: flightRecord.itineraries[0].segments[0].departure.at,
+                        destinationDateTime: flightRecord.itineraries[1].segments[0].departure.at,
                         transferNumberDeparture: flightRecord.itineraries[0].segments.length - 1,
                         transferNumberArrival: flightRecord.itineraries[1].segments.length - 1,
                         currency: flightRecord.price.currency,
                         totalCost: parseFloat(flightRecord.price.grandTotal),
                         passagers: flightRecord.travelerPricings.length
                     });
-                    //var departureTime = flightRecord.itineraries[0].segments[0].departure.at.split('T').pop();
-                    //var destinationTime = flightRecord.itineraries[1].segments[0].departure.at.split('T').pop();
-                    /*var flight = {
-                        departureAirport: $('#departurePicker option:selected').text(),
-                        departureDate: $('#departureDatePicker').val() + " " + departureTime,
-                        destinationAirport: $('#destinationPicker option:selected').text(),
-                        returnDate: $('#destinationDatePicker').val() + " " + destinationTime,
-                        transferNumberDeparture: flightRecord.itineraries[0].segments.length-1,
-                        transferNumberArrival: flightRecord.itineraries[1].segments.length-1,
-                        passagers: $('#passagerNumberPicker').val(),//flightRecord.numberOfBookableSeats,
-                        currency: $('#currencyPicker').val(),
-                        totalCost: parseFloat(flightRecord.price.total)
-                    };
-                    flightData.push(flight);*/
                 });
                 ShowData(flightData);
-                
+
+
             },
             error: function (e) {
                 alert("Nije moguće filtrirati po zadanim parametrima.");
@@ -325,7 +305,7 @@
             contentType: "application/json;charset=utf-8",
             data: JSON.stringify({ flightList: flightData }),
             success: function (flightView) {
-                debugger;
+                PageNumberSetup();
                 $('#resultTable').html(flightView);
                 $('#loadingGIF').hide();
                 $('#resultTable').show();

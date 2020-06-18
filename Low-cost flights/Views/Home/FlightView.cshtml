@@ -1,4 +1,8 @@
-﻿@model IEnumerable<Low_cost_flights.Models.FlightData>
+﻿@using PagedList;
+@using PagedList.Mvc;
+@using System.Web.Mvc.Html
+@model PagedList.IPagedList<Low_cost_flights.Models.FlightData>
+@using Low_cost_flights.Controllers
 @{
     ViewBag.Title = "Flight data";
 
@@ -14,6 +18,9 @@
     .inner {
         display: inline-block;
     }
+    .flightView tr {
+        line-height: 12px;
+    }
 </style>
 @if (Model == null || Model.Count() == 0)
 {
@@ -21,7 +28,7 @@
 }
 else
 {
-    <table class="table table-bordered table-condensed table-striped text-center" runat="server" id="detailTable" style="position:center;">
+    <table class="table table-bordered table-condensed table-striped text-center flightView" runat="server" id="flightView" style="position:center;">
         <tr>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Polazni aerodrom
@@ -42,9 +49,6 @@ else
                 Putnici
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Valuta
-            </th>
-            <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Cijena
             </th>
         </tr>
@@ -62,10 +66,10 @@ else
                     @Html.DisplayFor(modelItem => item.destinationAirport)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
-                    @Html.DisplayFor(modelItem => item.departureDate)
+                    @Html.DisplayFor(modelItem => item.departureDateTime)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
-                      @Html.DisplayFor(modelItem => item.returnDate)
+                    @Html.DisplayFor(modelItem => item.destinationDateTime)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
                     @Html.DisplayFor(modelItem => item.transferNumberDeparture)
@@ -77,17 +81,121 @@ else
                     @Html.DisplayFor(modelItem => item.passagers)
                 </td>
                 <td style="text-align:center;vertical-align:middle">
-                    @Html.DisplayFor(modelItem => item.currency)
-                </td>
-                <td style="text-align:center;vertical-align:middle">
-                    @Html.DisplayFor(modelItem => item.totalCost)
+                    @{var cost = item.totalCost + " " + item.currency;}
+                    @Html.DisplayFor(modelItem => cost)
                 </td>
             </tr>
         }
     </table>
 }
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/bootstrap")
+@if (Model != null && Model.Count() != 0)
+{
+    <div id="paginationFlightView" style="margin-bottom:80px;">
+        <div class="pull-right">
+            <div class="top pull-right">
+                <label style="font-weight:normal;padding-right:10px;">
+                    Zapisi po stranici:
+                    <select class="mdb-select md-form multiselect" id="elementsPerPage">
+                        <option id="10" value="10">10</option>
+                        <option id="20" value="20">20</option>
+                        <option id="50" value="50">50</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <label class="top pull-left" style="font-weight:normal;padding-left:10px;">@Model.Count() od @HomeController.elementsPerPage zapisa </label>
+        @Html.PagedListPager(Model, page => Url.Action("GetFlightViewPage", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+}
 
-@Styles.Render("~/Content/css")
+
+
+<!--Default skripta za postavljanje elemenata na stranici-->
+<script>
+    (function ($) {
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("GetElementsPerPage", "Home")',
+                type: 'GET',
+                success: function (elementNumber) {
+                    jQuery.each($('#elementsPerPage option'), function (listID, element) {
+                        if (element.value == elementNumber)
+                            element.selected = true;
+                        else
+                            element.selected = false;
+                    });
+                },
+                error: function (error) {
+                    debugger;
+                     alert("Greška u dohvaćanju broja elemenata po stranici.");
+                }
+            });
+        });
+    })(jQuery);
+</script>
+
+
+<!--Metoda koja se aktivira kada promjenimo broj elemenata po stranici-->
+<script>
+    $('#elementsPerPage').change(function (elementsNumber) {
+        $.ajax({
+            url: '@Url.Action("ChangeElementsPerPage", "Home")',
+            type: 'POST',
+            data: {
+                'newElementsNumber': elementsNumber.target.value
+            },
+            success: function () {
+
+                //$('#reloadGIF').show();
+                //$('#resultTable').hide();
+                //FilterData();
+                GetNewData();
+            },
+            error: function (error) {
+                debugger;
+                alert("Greška u promjeni broja elemenata po stranici.");
+            }
+        });
+    });
+</script>
+
+
+
+<!--Skripta koja sluzi da se dohvate stranice tj. da se prikaze element za paginaciju-->
+<script>
+    $('#paginationFlightView').on('click', 'a', function (e) {
+        if (this.href != null && this.href != "") {
+            $.ajax({
+                url: this.href,
+                type: 'GET',
+                success: function (result) {
+                    $('#resultTable').html(result);
+                },
+                error: function (result) {
+                    alert("Greška u dohvaćanju broja stranica.");
+                }
+            });
+            return false;
+        }
+    });
+</script>
+
+
+<script>
+    function GetNewData() {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetNewData", "Home")',
+            contentType: "application/json;charset=utf-8",
+            success: function (result) {
+                $('#resultTable').html(result);
+            },
+            error: function (error) {
+                alert("Greška u autorizaciji.")
+            }
+        });
+    }
+</script>
+
+

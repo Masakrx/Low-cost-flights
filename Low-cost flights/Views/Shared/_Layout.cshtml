@@ -9,16 +9,16 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/daterangepickerJS")
     @Styles.Render("~/bundles/daterangepickerCSS")
-    @Scripts.Render("~/bundles/bootstrap")
+    
 </head>
 <body>
-    <img src="~/loading.gif" id="loadingGIF" class="center-block" style="position:fixed;top:30%;left:40%;"/>
-    <div id="mainDiv" class="container-fluid body-content" hidden>
+    <img src="~/loading.gif" id="loadingGIF" class="center-block" style="position:fixed;top:30%;left:40%;" />
+    <div id="mainDiv" class="container body-content" hidden>
         <br />
         @RenderBody()
     </div>
 
-    
+    @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
 </html>
