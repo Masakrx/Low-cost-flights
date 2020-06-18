@@ -34,7 +34,7 @@
         <select class="chosen-container  Airport" style="display: inline-block;" id="departurePicker"></select>
 
         <label style="margin-left:10px;margin-right:5px;">Polazak:</label>
-        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:120px;height:25px;display:inline-block;text-align:center" />
+        <input type="text" name="departureDatePicker" id="departureDatePicker" class="form-control singleDatePickers" style="width:120px;height:30px;display:inline-block;text-align:center" />
 
 
         <label style="margin-right:5px;margin-left:10px;">Odredišni aerodrom:</label>
@@ -42,7 +42,7 @@
 
 
         <label style="margin-left:10px;margin-right:5px;">Povratak:</label>
-        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:120px;height:25px;display:inline-block;text-align:center" />
+        <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:120px;height:30px;display:inline-block;text-align:center" />
 
         <label for="currencyPicker" style="margin-left:5px; display:inline-block">Valuta:</label>
         <select  type="submit" id="currencyPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
@@ -52,27 +52,26 @@
         </select>
 
     </div>
-    <div style="margin-bottom:10px;position:center;display:inline-block">
-
-        <label for="adultsNumberPicker" style="margin-right:5px;">Odrasli (12+):</label>
+    <div style="margin-bottom:10px;position:center;display:inline-block;text-align:center">
+        <label for="adultsNumberPicker" style="margin-right:5px;margin-top:2px;">Odrasli (12+):</label>
         <div class="quantity buttons_added border">
             <input type="button" onclick="GetMaxInfants()" value="-" class="minus border"><input id="adultsNumberPicker" type="number" step="1" min="1" name="adultsQuantity" value="1" class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
 
-        <label for="childrenNumberPicker" style="margin-right:5px;margin-left:10px;">Djeca (2-12):</label>
-        <div class="quantity buttons_added border">
+        <label for="childrenNumberPicker" style="margin-right:5px;margin-left:10px;margin-top:2px;">Djeca (2-12):</label>
+        <div class="quantity buttons_added border" >
             <input type="button" value="-" class="minus border"><input id="childrenNumberPicker" type="number" step="1" min="0" name="childrenQuantity" value="1"  class="input-text qty text" size="4" ><input type="button" value="+" class="plus border">
         </div>
 
-        <label for="infantsNumberPicker" style="margin-right:5px;margin-left:10px;">Novorođenčad (0-2):</label>
+        <label for="infantsNumberPicker" style="margin-right:5px;margin-left:10px;margin-top:2px;">Novorođenčad (0-2):</label>
         <div class="quantity buttons_added border">
             <input onclick="GetMaxInfants()" type="button" value="-" class="minus border"><input id="infantsNumberPicker" type="number" step="1" min="0" name="infantsQuantity" value="0"  class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
     </div>
     <div style="position:relative;float:right;padding-right:10px;margin-bottom:10px;">
-        <button style="width:80px;height:25px;padding:0px;" type="submit" class="btn btn-primary" name="search" id="search">Pretraži</button>
+        <button style="width:80px;height:30px;padding:0px;" type="submit" class="btn btn-primary" name="search" id="search">Pretraži</button>
     </div>
-    <hr class="form-group form-inline" style="margin-top: 20px;" />
+    <hr class="form-group form-inline" style="margin-top: 10px;" />
 </div>
 
 <img src="~/loading.gif" id="reloadGIF" class="center-block" style="position:fixed;top:30%;left:40%;" />
@@ -103,7 +102,6 @@
 
 <script>
     function GetMaxInfants() {
-
         var infantPicker = document.getElementById("infantsNumberPicker");
         var x = $('#adultsNumberPicker').val();
         //$('#infantsNumberPicker').val(0);
@@ -164,7 +162,8 @@
                     format: 'DD.MM.YYYY.',
                     daysOfWeek: ["Ned", "Pon", "Uto",
                         "Sri", "Čet", "Pet", "Sub"],
-                    monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
+                    monthNames: ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj",
+                        "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
                 },
                 changeYear: true,
                 changeMonth: true,
