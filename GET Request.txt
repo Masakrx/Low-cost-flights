@@ -1,0 +1,75 @@
+ /*var departureDateTemp = $('#departureDatePicker').val().slice(0, -1).toString().split('.');
+        var departureDate = departureDateTemp[2] + "-" + departureDateTemp[1] + "-" + departureDateTemp[0];
+        var destinationDateTemp = $('#destinationDatePicker').val().slice(0, -1).toString().split('.');
+        var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];
+
+        var currencyCode = $('#currencyPicker').val();
+        var sources = ["GDS"];
+        var originDestinations = [
+            {
+                id: "1",
+                originLocationCode: $('#departurePicker option:selected').text(),
+                destinationLocationCode: $('#destinationPicker option:selected').text(),
+                departureDateTimeRange: {
+                    date: departureDate
+                }
+            },
+            {
+                id: "2",
+                originLocationCode: $('#destinationPicker option:selected').text(),
+                destinationLocationCode: $('#departurePicker option:selected').text(),
+                departureDateTimeRange: {
+                    date: returnDate
+                }
+            }
+        ];
+        var adultsCount = parseInt($('#adultsNumberPicker').val());
+        var childrenCount = parseInt($('#childrenNumberPicker').val());
+        var travelers = [];
+        for (var i = 0; i < adultsCount; i++) {
+            travelers.push({ id: i + 1, travelerType: "ADULT" });
+        }
+        for (var j = 0; j < childrenCount; j++) {
+            travelers.push({ id: adultsCount+j+1, travelerType: "CHILD" });
+        }
+        //var test = JSON.stringify({ currencyCode: currencyCode, originDestinations: originDestinations, travelers: travelers, sources: sources });
+        //debugger;
+        $.ajax({
+            type: "POST",
+            url: "https://test.api.amadeus.com/v2/shopping/flight-offers",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + amadeusAccessToken);
+            },
+            contentType: "application/vnd.amadeus+json",
+            data: JSON.stringify({ currencyCode: currencyCode, originDestinations: originDestinations, travelers: travelers, sources: sources }),
+            dataType: 'json',
+            success: function (jsonResult) {
+                //DownloadJSON(jsonResult);
+                var flightData = new Array();
+                jQuery.each(jsonResult.data, function (ID, flightRecord) {
+                    flightData.push({
+                        departureAirport: flightRecord.itineraries[0].segments[0].departure.iataCode,
+                        destinationAirport: flightRecord.itineraries[1].segments[0].departure.iataCode,
+                        departureDateTime: flightRecord.itineraries[0].segments[0].departure.at,
+                        destinationDateTime: flightRecord.itineraries[1].segments[0].departure.at,
+                        transferNumberDeparture: flightRecord.itineraries[0].segments.length - 1,
+                        transferNumberArrival: flightRecord.itineraries[1].segments.length - 1,
+                        currency: flightRecord.price.currency,
+                        totalCost: parseFloat(flightRecord.price.grandTotal),
+                        passagers: flightRecord.travelerPricings.length,
+                        max: 10
+                    });
+                });
+                var request_time = new Date().getTime() - start_time;
+                request_time = Math.floor((request_time % 6e4) / 1000);
+                alert(request_time);
+                ShowData(flightData);
+            },
+            error: function (error) {
+                alert("Nije moguće filtrirati po zadanim parametrima.");
+                $('#reloadGIF').hide();
+            }
+        });
+
+        */
+        //var testPreview = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2020-08-01&returnDate=2020-08-05&adults=2&max=100";

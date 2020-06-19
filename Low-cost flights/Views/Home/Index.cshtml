@@ -2,18 +2,18 @@
     ViewBag.Title = "Home Page";
 }
 
-<style>   
-    .btn-group{
-        width:80px;
-        min-height:25px;
-        padding-bottom:2px;
+<style>
+    .btn-group {
+        width: 80px;
+        min-height: 25px;
+        padding-bottom: 2px;
     }
 
     .chosen-container {
-        /* This is the only width setting you'll need to change. */
         width: 120px !important;
         padding-bottom: 5px !important;
     }
+
         .chosen-container .chzn-drop {
             width: 120px !important;
         }
@@ -45,7 +45,7 @@
         <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:120px;height:30px;display:inline-block;text-align:center" />
 
         <label for="currencyPicker" style="margin-left:5px; display:inline-block">Valuta:</label>
-        <select  type="submit" id="currencyPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
+        <select type="submit" id="currencyPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
             <option id="1">USD</option>
             <option id="2">EUR</option>
             <option id="3">HRK</option>
@@ -55,17 +55,17 @@
     <div style="margin-bottom:10px;position:center;display:inline-block;text-align:center">
         <label for="adultsNumberPicker" style="margin-right:5px;margin-top:2px;">Odrasli (12+):</label>
         <div class="quantity buttons_added border">
-            <input type="button" onclick="GetMaxInfants()" value="-" class="minus border"><input id="adultsNumberPicker" type="number" step="1" min="1" name="adultsQuantity" value="1" class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
+            <input type="button" onclick="GetMaxInfants()" value="-" class="minus border"><input id="adultsNumberPicker" type="number" step="1" min="1" name="adultsQuantity" value="1" class="input-text qty text" size="4"><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
 
         <label for="childrenNumberPicker" style="margin-right:5px;margin-left:10px;margin-top:2px;">Djeca (2-12):</label>
-        <div class="quantity buttons_added border" >
-            <input type="button" value="-" class="minus border"><input id="childrenNumberPicker" type="number" step="1" min="0" name="childrenQuantity" value="1"  class="input-text qty text" size="4" ><input type="button" value="+" class="plus border">
+        <div class="quantity buttons_added border">
+            <input type="button" value="-" class="minus border"><input id="childrenNumberPicker" type="number" step="1" min="0" name="childrenQuantity" value="0" class="input-text qty text" size="4"><input type="button" value="+" class="plus border">
         </div>
 
         <label for="infantsNumberPicker" style="margin-right:5px;margin-left:10px;margin-top:2px;">Novorođenčad (0-2):</label>
         <div class="quantity buttons_added border">
-            <input onclick="GetMaxInfants()" type="button" value="-" class="minus border"><input id="infantsNumberPicker" type="number" step="1" min="0" name="infantsQuantity" value="0"  class="input-text qty text" size="4" ><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
+            <input onclick="GetMaxInfants()" type="button" value="-" class="minus border"><input id="infantsNumberPicker" type="number" step="1" min="0" name="infantsQuantity" value="0" class="input-text qty text" size="4"><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
     </div>
     <div style="position:relative;float:right;padding-right:10px;margin-bottom:10px;">
@@ -76,7 +76,7 @@
 
 <img src="~/loading.gif" id="reloadGIF" class="center-block" style="position:fixed;top:30%;left:40%;" />
 <div id="resultTable">
-    
+
 </div>
 
 
@@ -104,10 +104,8 @@
     function GetMaxInfants() {
         var infantPicker = document.getElementById("infantsNumberPicker");
         var x = $('#adultsNumberPicker').val();
-        //$('#infantsNumberPicker').val(0);
-
         infantPicker.setAttribute('max', $('#adultsNumberPicker').val());
-        
+
     }
 </script>
 <!--Skripta koja sluzi da se ukljuci checkbox sve stranice ako postoji samo jedna stranica (radi printanja)-->
@@ -158,7 +156,7 @@
         jQuery.each(pickers, function (ID, picker) {
             $(picker).daterangepicker({
                 singleDatePicker: true,
-                locale: {                  
+                locale: {
                     format: 'DD.MM.YYYY.',
                     daysOfWeek: ["Ned", "Pon", "Uto",
                         "Sri", "Čet", "Pet", "Sub"],
@@ -188,7 +186,7 @@
             $('#destinationPicker').trigger("chosen:updated");
         }
         else if (picker == "destinationPicker") {
-            jQuery.each($('#departurePicker option:disabled'), function (ID, picker) {
+            jQuery.each($('#departurePicker option:disabled'), function (ID, option) {
                 $('#departurePicker option[id=' + option.id + ']').prop("disabled", false);
                 $('#departurePicker').trigger("chosen:updated");
             });
@@ -227,17 +225,58 @@
         Authorization();
         $('#reloadGIF').show();
         $('#resultTable').hide();
-        
+
     });
 </script>
 
 <script>
-    function GetData(amadeusAccessToken) {
-        //var testPreview = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2020-08-01&returnDate=2020-08-05&adults=2&max=100";
+    function FindData() {
         var departureDateTemp = $('#departureDatePicker').val().slice(0, -1).toString().split('.');
         var departureDate = departureDateTemp[2] + "-" + departureDateTemp[1] + "-" + departureDateTemp[0];
         var destinationDateTemp = $('#destinationDatePicker').val().slice(0, -1).toString().split('.');
         var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];
+
+        var url = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
+            $.param({
+                originLocationCode: $('#departurePicker option:selected').text(),
+                destinationLocationCode: $('#destinationPicker option:selected').text(),
+                departureDate: departureDate,
+                returnDate: returnDate,
+                currencyCode: $('#currencyPicker').val(),
+                adults: $('#adultsNumberPicker').val(),
+                children: $('#childrenNumberPicker').val(),
+                infants: $('#infantsNumberPicker').val()
+            });
+        var compareURL = url.split('?').pop();
+        debugger;
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: '@Url.Action("FindJSON", "Home")',
+            data: {
+                'url': compareURL
+            },
+            success: function (jsonResult) {
+                debugger;
+            },
+            error: function (error) {
+                alert("Dogodila se greška tokom dohvaćanja json datoteku.")
+            }
+        });
+
+        //ako ne postoji zapis, vrati url,
+        //ako postoji rezultat, ShowData(jsonZapis)
+
+    }
+</script>
+
+
+<script>
+    function GetData(amadeusAccessToken) {
+       // var start_time = new Date().getTime();
+
+       //ovdje treba dohvatiti URL ili json zapis
+        var url = FindData();
         $.ajax({
             async: true,
             type: "GET",
@@ -245,23 +284,11 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + amadeusAccessToken);
             },
-            url: "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
-                $.param({
-                    originLocationCode: $('#departurePicker option:selected').text(),
-                    destinationLocationCode: $('#destinationPicker option:selected').text(),
-                    departureDate: departureDate,
-                    returnDate: returnDate,
-                    currencyCode: $('#currencyPicker').val(),
-                    adults: $('#adultsNumberPicker').val(),
-                    children: $('#childrenNumberPicker').val(),
-                    infants: $('#infantsNumberPicker').val(),
-                    max: 250
-
-                }),
+            url: url,
             success: function (jsonResult) {
                 //download JSON file
                 //DownloadJSON(jsonResult);
-
+                SaveResultJSON(jsonResult);
                 var flightData = new Array();
                 jQuery.each(jsonResult.data, function (ID, flightRecord) {
                     flightData.push({
@@ -276,6 +303,9 @@
                         passagers: flightRecord.travelerPricings.length
                     });
                 });
+                //var request_time = new Date().getTime() - start_time;
+                //request_time = Math.floor((request_time % 6e4) / 1000);
+                //alert(request_time);
                 ShowData(flightData);
 
 
@@ -285,20 +315,6 @@
                 $('#reloadGIF').hide();
             }
         });
-    }
-</script>
-
-<script>
-    function DownloadJSON(jsonResult) {
-        const filename = 'data.json';
-        const jsonStr = JSON.stringify(jsonResult.data);
-        let element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
     }
 </script>
 
@@ -323,4 +339,39 @@
         });
     }
 </script>
+
+
+<script>
+    function DownloadJSON(jsonResult) {
+        const filename = 'data.json';
+        const jsonStr = JSON.stringify(jsonResult.data);
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+</script>
+
+<script>
+    function SaveResultJSON(jsonResult) {
+        //JSON.stringify({ data: JSON.stringify(jsonResult), link: jsonResult.meta.links.self })
+        $.ajax({
+            url: '@Url.Action("SaveJSON", "Home")',
+            type: "POST",
+            data: JSON.stringify({ data: JSON.stringify(jsonResult) }),
+            dataType:"json",
+            contentType: "application/json",
+            success: function (result) {
+                debugger;
+            },
+            error: function (error) {
+                alert("Greška u spremanju .json rezultata.")
+            }
+        });
+    }
+</script>
+
 

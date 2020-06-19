@@ -30,32 +30,35 @@
 else
 {
     <table class="table table-bordered table-condensed table-striped text-center flightView" runat="server" id="flightView" style="position:center;">
-        <tr>
+        <tr style="cursor:pointer">
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Polazni aerodrom
+                <a onclick="Sort('departureAirport')">Polazni aerodrom</a>
+                
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Odredišni aerodrom
+                <a onclick="Sort('destinationAirport')">Odredišni aerodrom</a>
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Datum polaska
+                <a onclick="Sort('departureDateTime')">Datum polaska</a>
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Datum povratka
+                <a onclick="Sort('destinationDateTime')">Datum povratka</a>
+                
             </th>
             <th colspan="2" class="text-center" style="text-align:center;vertical-align:middle">
                 Presjedanja
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Putnici
+                <a onclick="Sort('Passagers')">Putnici</a>
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                Cijena
+                <a onclick="Sort('totalCost')">Cijena</a>
+                
             </th>
         </tr>
-        <tr>
-            <th>Dolazak</th>
-            <th>Odlazak</th>
+        <tr style="cursor:pointer">
+            <th><a onclick="Sort('transferNumberDeparture')">Dolazak</a></th>
+            <th><a onclick="Sort('transferNumberArrival')">Odlazak</a></th>
         </tr>
         @foreach (var item in Model)
         {
@@ -183,6 +186,24 @@ else
             return false;
         }
     });
+</script>
+
+<script>
+    function Sort(kolumna) {
+         $.ajax({
+             url: '@Url.Action("SortColumn", "Home")',
+             type: 'GET',
+             data: {
+                 'kolumna': kolumna
+                },
+             success: function (sortirano) {
+                     $('#resultTable').html(sortirano);
+                },
+                error: function (error) {
+                    alert("Greška tokom sortiranja podataka.");
+                }
+            });
+    }
 </script>
 
 
