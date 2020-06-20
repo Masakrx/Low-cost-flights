@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Low-cost flights";
 }
 
 <style>
@@ -8,23 +8,10 @@
         min-height: 25px;
         padding-bottom: 2px;
     }
-
     .chosen-container {
         width: 120px !important;
         padding-bottom: 5px !important;
     }
-
-        .chosen-container .chzn-drop {
-            width: 120px !important;
-        }
-
-            .chosen-container .chzn-drop .chzn-search {
-                width: 98% !important;
-            }
-
-                .chosen-container .chzn-drop .chzn-search input {
-                    width: 98% !important;
-                }
 </style>
 
 <div class="form-group" style="position:center;">
@@ -44,12 +31,8 @@
         <label style="margin-left:10px;margin-right:5px;">Povratak:</label>
         <input type="text" name="destinationDatePicker" id="destinationDatePicker" class="form-control singleDatePickers" style="width:120px;height:30px;display:inline-block;text-align:center" />
 
-        <label for="currencyPicker" style="margin-left:5px; display:inline-block">Valuta:</label>
-        <select type="submit" id="currencyPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
-            <option id="1">USD</option>
-            <option id="2">EUR</option>
-            <option id="3">HRK</option>
-        </select>
+        <label for="directFlight" style="margin-right:5px;margin-left:10px;margin-top:2px;">Direktni letovi</label>
+        <input class="checkbox" style="display:inline-block" type="checkbox" id="directFlight" checked="checked" />
 
     </div>
     <div style="margin-bottom:10px;position:center;display:inline-block;text-align:center">
@@ -68,22 +51,37 @@
             <input onclick="GetMaxInfants()" type="button" value="-" class="minus border"><input id="infantsNumberPicker" type="number" step="1" min="0" name="infantsQuantity" value="0" class="input-text qty text" size="4"><input onclick="GetMaxInfants()" type="button" value="+" class="plus border">
         </div>
     </div>
-    <div style="position:relative;float:right;padding-right:10px;margin-bottom:10px;">
+
+    <label for="currencyPicker" style="margin-left:10px; display:inline-block">Valuta:</label>
+    <select type="submit" id="currencyPicker" style="padding-bottom:10px; width:20px;">
+        <option id="1">EUR</option>
+        <option id="2">HRK</option>
+        <option id="3">USD</option>
+    </select>
+
+    <label for="classPicker" style="margin-left:10px; display:inline-block">Razred:</label>
+    <select type="submit" id="classPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
+        <option id="1">ECONOMY</option>
+        <option id="2">PREMIUM_ECONOMY</option>
+        <option id="3">BUSINESS</option>
+        <option id="4">FIRST</option>
+    </select>
+
+    <div style="position:relative;float:right;margin-bottom:10px;">
         <button style="width:80px;height:30px;padding:0px;" type="submit" class="btn btn-primary" name="search" id="search">Pretraži</button>
     </div>
+
     <hr class="form-group form-inline" style="margin-top: 10px;" />
 </div>
 
 <img src="~/loading.gif" id="reloadGIF" class="center-block" style="position:fixed;top:30%;left:40%;" />
-<div id="resultTable">
-
-</div>
-
+<div id="resultTable"></div>
 
 <script>
     (function ($) {
         $(function () {
             UpdateElements();
+            $("#classPicker").multiselect();
             $("#currencyPicker").multiselect();
             $('#mainDiv').removeAttr("hidden");
         });
@@ -105,16 +103,15 @@
         var infantPicker = document.getElementById("infantsNumberPicker");
         var x = $('#adultsNumberPicker').val();
         infantPicker.setAttribute('max', $('#adultsNumberPicker').val());
-
+        infantPicker.setAttribute('value', $('#adultsNumberPicker').val());
     }
 </script>
-<!--Skripta koja sluzi da se ukljuci checkbox sve stranice ako postoji samo jedna stranica (radi printanja)-->
+
 <script>
     function PageNumberSetup() {
         $('#paginationFlightView').prop('hidden', false);
     }
 </script>
-
 
 <script>
     function UpdateAirports() {
@@ -176,7 +173,6 @@
     $('.Airport').change(function (event) {
         var picker = event.target.id;
         var optionID = event.target.value;
-        //var selectedValue = $("option:selected", this).attr("id");
         if (picker == "departurePicker") {
             jQuery.each($('#destinationPicker option:disabled'), function (ID, option) {
                 $('#destinationPicker option[id=' + option.id + ']').prop("disabled", false);
@@ -197,6 +193,15 @@
 </script>
 
 <script>
+    $('#search').click(function (e) {
+        e.preventDefault();
+        $('#resultTable').hide();
+        $('#reloadGIF').show();
+        Authorization();
+    });
+</script>
+
+<script>
     function Authorization() {
         $.ajax({
             type: "POST",
@@ -209,7 +214,7 @@
             },
             contentType: "application/x-www-form-urlencoded",
             success: function (result) {
-                GetData(result.access_token);
+                FindData(result.access_token);
             },
             error: function (error) {
                 alert("Greška u autorizaciji.")
@@ -218,24 +223,13 @@
     }
 </script>
 
-
-
 <script>
-    $('#search').click(function (e) {
-        Authorization();
-        $('#reloadGIF').show();
-        $('#resultTable').hide();
-
-    });
-</script>
-
-<script>
-    function FindData() {
+    function GetURL() {
         var departureDateTemp = $('#departureDatePicker').val().slice(0, -1).toString().split('.');
         var departureDate = departureDateTemp[2] + "-" + departureDateTemp[1] + "-" + departureDateTemp[0];
         var destinationDateTemp = $('#destinationDatePicker').val().slice(0, -1).toString().split('.');
-        var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];
-
+        var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];      
+        var isDirectFlight = ($('#directFlight').is(":checked")) ? true : false;
         var url = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
             $.param({
                 originLocationCode: $('#departurePicker option:selected').text(),
@@ -245,38 +239,47 @@
                 currencyCode: $('#currencyPicker').val(),
                 adults: $('#adultsNumberPicker').val(),
                 children: $('#childrenNumberPicker').val(),
-                infants: $('#infantsNumberPicker').val()
+                infants: $('#infantsNumberPicker').val(),
+                nonStop: isDirectFlight,
+                travelClass: $('#classPicker').val()
             });
-        var compareURL = url.split('?').pop();
-        debugger;
+
+        return url;
+    }
+</script>
+
+<script>
+    function FindData(amadeusAccessToken) {
+        var compareUrl = GetURL().split('?').pop();
         $.ajax({
-            async: false,
-            type: "GET",
+            async:true,
+            type: 'POST',
             url: '@Url.Action("FindJSON", "Home")',
             data: {
-                'url': compareURL
+                'compareUrl': compareUrl
             },
-            success: function (jsonResult) {
-                debugger;
+            success: function (flightView) {
+                if (flightView.success == false) {
+                    GetData(amadeusAccessToken);
+                }
+                else {
+                    PageNumberSetup();
+                    $('#resultTable').html(flightView);
+                    $('#reloadGIF').hide();
+                    $('#resultTable').show();
+                }
             },
             error: function (error) {
-                alert("Dogodila se greška tokom dohvaćanja json datoteku.")
+                alert("Dogodila se greška tokom dohvaćanja json datoteke.")
             }
         });
-
-        //ako ne postoji zapis, vrati url,
-        //ako postoji rezultat, ShowData(jsonZapis)
 
     }
 </script>
 
-
 <script>
     function GetData(amadeusAccessToken) {
-       // var start_time = new Date().getTime();
-
-       //ovdje treba dohvatiti URL ili json zapis
-        var url = FindData();
+        var url = GetURL();
         $.ajax({
             async: true,
             type: "GET",
@@ -286,8 +289,6 @@
             },
             url: url,
             success: function (jsonResult) {
-                //download JSON file
-                //DownloadJSON(jsonResult);
                 SaveResultJSON(jsonResult);
                 var flightData = new Array();
                 jQuery.each(jsonResult.data, function (ID, flightRecord) {
@@ -303,12 +304,8 @@
                         passagers: flightRecord.travelerPricings.length
                     });
                 });
-                //var request_time = new Date().getTime() - start_time;
-                //request_time = Math.floor((request_time % 6e4) / 1000);
-                //alert(request_time);
+
                 ShowData(flightData);
-
-
             },
             error: function (e) {
                 alert("Nije moguće filtrirati po zadanim parametrima.");
@@ -340,24 +337,8 @@
     }
 </script>
 
-
-<script>
-    function DownloadJSON(jsonResult) {
-        const filename = 'data.json';
-        const jsonStr = JSON.stringify(jsonResult.data);
-        let element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonStr));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    }
-</script>
-
 <script>
     function SaveResultJSON(jsonResult) {
-        //JSON.stringify({ data: JSON.stringify(jsonResult), link: jsonResult.meta.links.self })
         $.ajax({
             url: '@Url.Action("SaveJSON", "Home")',
             type: "POST",
@@ -365,7 +346,6 @@
             dataType:"json",
             contentType: "application/json",
             success: function (result) {
-                debugger;
             },
             error: function (error) {
                 alert("Greška u spremanju .json rezultata.")

@@ -13,8 +13,10 @@ namespace Low_cost_flights.Controllers
     public class HomeController : Controller
     {
         private static IList<FlightData> flightCollection;
-        static List<SortData> sortList;
+        private static List<SortData> sortList;
         public static int elementsPerPage = 10;
+        public static string folderPath = AppDomain.CurrentDomain.BaseDirectory + "Results" + "\\";
+
         public ActionResult Index()
         {
             return View();
@@ -50,7 +52,6 @@ namespace Low_cost_flights.Controllers
                 }
                 flightCollection = flightCollection.OrderBy(x => x.departureDateTime).ToList();
             }
-            //flightPagedList = flightList.ToPagedList(1, elementsPerPage);
 
             if (flightCollection.Count > 0)
             {
@@ -64,32 +65,6 @@ namespace Low_cost_flights.Controllers
                 }
             }
 
-            int numberOfElements = -1;
-            if (flightCollection != null) numberOfElements = flightCollection.Count;
-
-            int numberOfPages = 0;
-
-            if (numberOfElements == -1) { }
-            else
-            {
-                if (numberOfElements / elementsPerPage == 0)
-                {
-                    numberOfPages = 1;
-                }
-                else
-                {
-                    if (numberOfElements % elementsPerPage == 0)
-                    {
-                        numberOfPages = numberOfElements / elementsPerPage;
-                    }
-                    else
-                    {
-                        numberOfPages = numberOfElements / elementsPerPage + 1;
-                    }
-
-                }
-            }
-
             return PartialView("FlightView", flightCollection.ToPagedList(1, elementsPerPage));
         }
 
@@ -99,140 +74,15 @@ namespace Low_cost_flights.Controllers
             return PartialView("FlightView", flightCollection.ToPagedList(page, elementsPerPage));
         }
 
-
-        public int GetElementsPerPage()
-        {
-            return elementsPerPage;
-        }
-
-
-        public void ChangeElementsPerPage(int newElementsNumber)
-        {
-            elementsPerPage = newElementsNumber;
-        }
-
         public PartialViewResult GetNewData()
         {
             return PartialView("FlightView", flightCollection.ToPagedList(1, elementsPerPage));
         }
 
-        public ActionResult SortColumn(string kolumna)
-        {
-            var testKolumna = sortList.First(x => x.columnName == kolumna);
-            switch (kolumna)
-            {
-                case "departureAirport":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.departureAirport).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.departureAirport).ToList();
-                    }
-                    break;
 
-                case "departureDateTime":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.departureDateTime).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.departureDateTime).ToList();
-                    }
-                    break;
-
-                case "destinationAirport":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.destinationAirport).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.destinationAirport).ToList();
-                    }
-                    break;
-
-                case "destinationDateTime":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.destinationDateTime).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.destinationDateTime).ToList();
-                    }
-                    break;
-
-                case "Passagers":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.passagers).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.passagers).ToList();
-                    }
-                    break;
-
-                case "totalCost":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.totalCost).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.totalCost).ToList();
-                    }
-                    break;
-
-                case "transferNumberDeparture":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.transferNumberDeparture).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.transferNumberDeparture).ToList();
-                    }
-                    break;
-
-                case "transferNumberArrival":
-                    if (testKolumna.count == 0)
-                    {
-                        testKolumna.count++;
-                        flightCollection = flightCollection.OrderBy(x => x.transferNumberArrival).ToList();
-                    }
-                    else if (testKolumna.count == 1)
-                    {
-                        testKolumna.count = 0;
-                        flightCollection = flightCollection.OrderByDescending(x => x.transferNumberArrival).ToList();
-                    }
-                    break;
-            }
-
-
-            return PartialView("FlightView", flightCollection.ToPagedList(1, elementsPerPage));
-        }
 
         public ActionResult SaveJSON(JsonData json)
         {
-            var folderPath = AppDomain.CurrentDomain.BaseDirectory + "Results" + "\\";
             var filePath = folderPath+"temp.json";
             string text = System.Text.RegularExpressions.Regex.Unescape(json.data);
             System.IO.File.WriteAllText(filePath, text);
@@ -244,9 +94,182 @@ namespace Low_cost_flights.Controllers
             return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult FindJSON(string url)
+        public ActionResult FindJSON(string compareUrl)
         {
+            DirectoryInfo d = new DirectoryInfo(folderPath);
+            foreach (var file in d.GetFiles("*.json"))
+            {
+                var fileName = Path.GetFileNameWithoutExtension(file.Name);
+                if (fileName == compareUrl)
+                {
+                    JObject jsonObject = JObject.Parse(System.IO.File.ReadAllText(file.FullName));
+                    string currency = jsonObject.SelectTokens("data[0].price").Select(f => f["currency"]).FirstOrDefault().ToString();
+                    List<decimal> grandTotal = jsonObject.SelectTokens("data[*].price").Select(f => Math.Round(Convert.ToDecimal(f["grandTotal"]),2)).ToList();
+                    int passagers = jsonObject.SelectTokens("data[0].travelerPricings").Select(f => f.Count()).FirstOrDefault();
+                    var itineraries = jsonObject.SelectTokens("data[*]").Select(t =>new { segment = t["itineraries"].Select(z=>z["segments"]).ToList()}).ToList();
+                    int count = 0;
+                    flightCollection= new List<FlightData>();
+                    foreach (var segments in itineraries)
+                    {
+                        FlightData flightData = new FlightData();
+                        flightData.departureAirport = segments.segment[0].Select(t => t["departure"]).ToList().Select(g => g["iataCode"]).FirstOrDefault().ToString();
+                        flightData.departureDateTime = segments.segment[0].Select(t => t["departure"]).ToList().Select(g => g["at"]).FirstOrDefault().ToString();
+                        flightData.transferNumberArrival = segments.segment[0].Select(t => t["departure"]).ToList().Count-1;
+                        flightData.destinationAirport = segments.segment[1].Select(t => t["departure"]).ToList().Select(g => g["iataCode"]).FirstOrDefault().ToString();
+                        flightData.destinationDateTime = segments.segment[1].Select(t => t["departure"]).ToList().Select(g => g["at"]).FirstOrDefault().ToString();
+                        flightData.transferNumberArrival = segments.segment[1].Select(t => t["departure"]).ToList().Count-1;
+                        flightData.totalCost = grandTotal[count];
+                        flightData.passagers = passagers;
+                        flightData.currency = currency;
 
+                        flightCollection.Add(flightData);
+                        count++;
+                    }
+
+                    flightCollection = flightCollection.OrderBy(x => x.departureDateTime).ToList();
+
+                    if (flightCollection.Count > 0)
+                    {
+                        var x = flightCollection.First();
+                        sortList = new List<SortData>();
+                        foreach (PropertyInfo item in x.GetType().GetProperties())
+                        {
+                            SortData t = new SortData();
+                            t.columnName = item.Name;
+                            sortList.Add(t);
+                        }
+                    }
+
+                    return PartialView("FlightView", flightCollection.ToPagedList(1, elementsPerPage));
+                }
+            }
+            return Json(new { success = false }, JsonRequestBehavior.DenyGet);
+        }
+
+
+
+        public int GetElementsPerPage()
+        {
+            return elementsPerPage;
+        }
+
+        public ActionResult SortColumn(string column)
+        {
+            var columnName = sortList.First(x => x.columnName == column);
+            switch (column)
+            {
+                case "departureAirport":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.departureAirport).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.departureAirport).ToList();
+                    }
+                    break;
+
+                case "departureDateTime":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.departureDateTime).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.departureDateTime).ToList();
+                    }
+                    break;
+
+                case "destinationAirport":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.destinationAirport).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.destinationAirport).ToList();
+                    }
+                    break;
+
+                case "destinationDateTime":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.destinationDateTime).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.destinationDateTime).ToList();
+                    }
+                    break;
+
+                case "Passagers":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.passagers).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.passagers).ToList();
+                    }
+                    break;
+
+                case "totalCost":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.totalCost).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.totalCost).ToList();
+                    }
+                    break;
+
+                case "transferNumberDeparture":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.transferNumberDeparture).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.transferNumberDeparture).ToList();
+                    }
+                    break;
+
+                case "transferNumberArrival":
+                    if (columnName.count == 0)
+                    {
+                        columnName.count++;
+                        flightCollection = flightCollection.OrderBy(x => x.transferNumberArrival).ToList();
+                    }
+                    else if (columnName.count == 1)
+                    {
+                        columnName.count = 0;
+                        flightCollection = flightCollection.OrderByDescending(x => x.transferNumberArrival).ToList();
+                    }
+                    break;
+            }
+
+
+            return PartialView("FlightView", flightCollection.ToPagedList(1, elementsPerPage));
+        }
+
+        public void ChangeElementsPerPage(int newElementsNumber)
+        {
+            elementsPerPage = newElementsNumber;
         }
     }
 }

@@ -3,10 +3,6 @@
 @using System.Web.Mvc.Html
 @model PagedList.IPagedList<Low_cost_flights.Models.FlightData>
 @using Low_cost_flights.Controllers
-@{
-    ViewBag.Title = "Flight data";
-
-}
 
 @Scripts.Render("~/bundles/modernizr")
 
@@ -52,7 +48,7 @@ else
                 <a onclick="Sort('Passagers')">Putnici</a>
             </th>
             <th rowspan="2" class="text-center" style="text-align:center;vertical-align:middle">
-                <a onclick="Sort('totalCost')">Cijena</a>
+                <a onclick="Sort('totalCost')">Ukupna cijena</a>
                 
             </th>
         </tr>
@@ -95,30 +91,26 @@ else
 
 @if (Model != null && Model.Count() != 0)
 {
-<div id="paginationFlightView">
-    <div style="position:absolute;left:50%">
-        <div style="position: relative; left: -50%;">
-            @Html.PagedListPager(Model, page => Url.Action("GetFlightViewPage", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    <div id="paginationFlightView">
+        <div style="position:absolute;left:50%">
+            <div style="position: relative; left: -50%;">
+                @Html.PagedListPager(Model, page => Url.Action("GetFlightViewPage", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+            </div>
         </div>
+        <label style="font-weight:normal;padding-left:10px;">@Model.Count() od @HomeController.elementsPerPage zapisa </label>
+        <label style="font-weight:normal;margin-right:10px; position:relative;float:right">
+            Zapisi po stranici:
+            <select class="mdb-select md-form multiselect" id="elementsPerPage">
+                <option id="10" value="10">10</option>
+                <option id="20" value="20">20</option>
+                <option id="50" value="50">50</option>
+            </select>
+        </label>
+
+
     </div>
-    <label style="font-weight:normal;padding-left:10px;">@Model.Count() od @HomeController.elementsPerPage zapisa </label>
-    <label style="font-weight:normal;margin-right:10px; position:relative;float:right">
-        Zapisi po stranici:
-        <select class="mdb-select md-form multiselect" id="elementsPerPage">
-            <option id="10" value="10">10</option>
-            <option id="20" value="20">20</option>
-            <option id="50" value="50">50</option>
-        </select>
-    </label>
-
-
-</div>
 }
 
-
-
-
-<!--Default skripta za postavljanje elemenata na stranici-->
 <script>
     (function ($) {
         $(function () {
@@ -134,7 +126,6 @@ else
                     });
                 },
                 error: function (error) {
-                    debugger;
                      alert("Greška u dohvaćanju broja elemenata po stranici.");
                 }
             });
@@ -143,7 +134,6 @@ else
 </script>
 
 
-<!--Metoda koja se aktivira kada promjenimo broj elemenata po stranici-->
 <script>
     $('#elementsPerPage').change(function (elementsNumber) {
         $.ajax({
@@ -153,14 +143,9 @@ else
                 'newElementsNumber': elementsNumber.target.value
             },
             success: function () {
-
-                //$('#reloadGIF').show();
-                //$('#resultTable').hide();
-                //FilterData();
                 GetNewData();
             },
             error: function (error) {
-                debugger;
                 alert("Greška u promjeni broja elemenata po stranici.");
             }
         });
@@ -168,8 +153,6 @@ else
 </script>
 
 
-
-<!--Skripta koja sluzi da se dohvate stranice tj. da se prikaze element za paginaciju-->
 <script>
     $('#paginationFlightView').on('click', 'a', function (e) {
         if (this.href != null && this.href != "") {
@@ -189,20 +172,20 @@ else
 </script>
 
 <script>
-    function Sort(kolumna) {
-         $.ajax({
-             url: '@Url.Action("SortColumn", "Home")',
-             type: 'GET',
-             data: {
-                 'kolumna': kolumna
-                },
-             success: function (sortirano) {
-                     $('#resultTable').html(sortirano);
-                },
-                error: function (error) {
-                    alert("Greška tokom sortiranja podataka.");
-                }
-            });
+    function Sort(column) {
+        $.ajax({
+            url: '@Url.Action("SortColumn", "Home")',
+            type: 'GET',
+            data: {
+                'column': column
+            },
+            success: function (sorted) {
+                $('#resultTable').html(sorted);
+            },
+            error: function (error) {
+                alert("Greška tokom sortiranja podataka.");
+            }
+        });
     }
 </script>
 
