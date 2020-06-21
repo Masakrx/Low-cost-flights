@@ -61,10 +61,11 @@
 
     <label for="classPicker" style="margin-left:10px; display:inline-block">Razred:</label>
     <select type="submit" id="classPicker" style="display:inline-block;padding-bottom:10px; width:20px;">
-        <option id="1">ECONOMY</option>
-        <option id="2">PREMIUM_ECONOMY</option>
-        <option id="3">BUSINESS</option>
-        <option id="4">FIRST</option>
+        <option id="1" value="sviRazredi" selected="selected">Svi razredi</option>
+        <option id="2" value="ECONOMY" >Economy</option>
+        <option id="3" value="PREMIUM_ECONOMY" >Premium_Economy</option>
+        <option id="4" value="BUSINESS" >Business</option>
+        <option id="5" value="FIRST" >First</option>
     </select>
 
     <div style="position:relative;float:right;margin-bottom:10px;">
@@ -230,6 +231,8 @@
         var destinationDateTemp = $('#destinationDatePicker').val().slice(0, -1).toString().split('.');
         var returnDate = destinationDateTemp[2] + "-" + destinationDateTemp[1] + "-" + destinationDateTemp[0];      
         var isDirectFlight = ($('#directFlight').is(":checked")) ? true : false;
+        var travelClass = ($('#classPicker option:selected').val() == "sviRazredi") ? "" : $('#classPicker').val();
+        debugger;
         var url = "https://test.api.amadeus.com/v2/shopping/flight-offers?" +
             $.param({
                 originLocationCode: $('#departurePicker option:selected').text(),
@@ -241,8 +244,12 @@
                 children: $('#childrenNumberPicker').val(),
                 infants: $('#infantsNumberPicker').val(),
                 nonStop: isDirectFlight,
-                travelClass: $('#classPicker').val()
+                travelClass: travelClass
             });
+        if (travelClass == ""){
+            var x = url.slice(0, -13);
+            debugger;
+        }
 
         return url;
     }
